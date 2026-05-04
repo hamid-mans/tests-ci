@@ -31,3 +31,37 @@ jobs:
         with:
           name: coverage-report
           path: coverage/
+
+  sonarcloud:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout du code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Important pour SonarQube (analyse de l'historique Git)
+
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 📦 Installation
+        run: npm ci
+
+      - name: 🧪 Tests & Coverage
+        # Génère le dossier coverage/lcov.info
+        run: npm test -- --ci --coverage
+
+      - name: 🛡️ SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets:SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets:SONAR_HOST_URL }}
+        with:
+          args: >
+            -Dsonar.projectKey=25e14bebdce67ec37ec9998ca6ddcf55e1e02d71
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+            -Dsonar.sources=src
+            -Dsonar.tests=src
+            -Dsonar.test.inclusions=**/*.test.js,**/*.spec.js

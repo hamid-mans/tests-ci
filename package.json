@@ -7,6 +7,10 @@
     "test": "jest",
     "start": "node start.js"
   },
+  "jest": {
+    "collectCoverage": true,
+    "coverageReporters": ["lcov", "text"]
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
