@@ -1,0 +1,33 @@
+name: Jest CI
+
+on:
+  push:
+    branches: main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout du code
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 📦 Installation des dépendances
+        # npm ci est plus rapide et strict que npm install pour la CI
+        run: npm ci
+
+      - name: 🧪 Exécution des tests Jest
+        # L'argument --ci est crucial ici
+        run: npm test -- --ci --coverage --maxWorkers=2
+
+      - name: 📊 Upload du rapport de couverture
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
